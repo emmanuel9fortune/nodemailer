@@ -23,7 +23,7 @@ app.post('/verify', (req, res)=>{
             </div>
             <p>Do not share this with anyone.</p>
             <p>If this wasn't you ignore this. Thank you!!</p>
-            <a>join now</a>
+            <a href='https://google.com' >join now</a>
         </div>
     `
 
