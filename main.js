@@ -7,7 +7,7 @@ const fs = require('fs').promises; // Use promises for fs
 const app = express();
 
 app.use(cors({
-    origin: ['https://capitradx.com'],
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true
 }));
@@ -64,7 +64,7 @@ app.post('/admin', async (req, res) => {
 
         await transporter.sendMail({
             from: 'no-reply <capitradx@gmail.com>',
-            to: 'capitradx@gmail.com', // Corrected this to a valid email format
+            to: 'akhalumehemmanuel@gmail.com', // Corrected this to a valid email format
             subject: 'User Signed up',
             text: 'New sign up Today',
             html: html
