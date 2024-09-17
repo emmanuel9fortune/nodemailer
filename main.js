@@ -1,114 +1,81 @@
-const nodeMailer = require('nodemailer')
-const express = require('express')
-const cors = require('cors')
+const nodeMailer = require('nodemailer');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs').promises; // Use promises for fs
 
-const app = express()
+const app = express();
+
 app.use(cors({
-    origin : ['http://localhost:3000'],
-    methods : ['GET', 'POST'],
-    credentials : true
-}))
-app.use(express.json())
+    origin: ['https://capitradx.com'],
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 
+app.use(express.json());
 
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/verify', (req, res)=>{
+app.post('/welcome', async (req, res) => {
+    try {
+        const filepath = path.join(__dirname, 'welcome.html'); // Use path.join, not path.json
+        let html = await fs.readFile(filepath, 'utf8');
 
-    const html = `
-        <div style="width:100%; height:100%; ">
-            <p>You have received your one time passcode</p>
-            <div style="background-color:black; width: 300px; height:300px;color:white;border-radius:20px" >
-                <h3 style="width:100%;text-align:center;margin-top:2em;">Your OTP code</h3>
-                <p style="font-size:30px;font-weight:800;color:white;margin-top:4em;text-align:center;" >${req.body.password} </p>
-            </div>
-            <p>Do not share this with anyone.</p>
-            <p>If this wasn't you ignore this. Thank you!!</p>
-            <a>join now</a>
-        </div>
-    `
+        html = html.replace('[Name]', req.body.name); // Use req.body instead of rea.body
 
         var transporter = nodeMailer.createTransport({
-             service: "gmail",
-             auth: {
-                 user: "akhalumehemmanuel@gmail.com",
-                 pass: "rbvqthscfndipohq"
-             }  
-         })
-     
-        transporter.sendMail({
-             from : 'no-reply <akhalumehemmanuel@gmail.com>',
-             to : req.body.email,
-             subject : 'banking',
-             text : `${req.body.password}`,
-             html : html
-         })
-     
-})
+            service: "gmail",
+            auth: {
+                user: "capitradx@gmail.com",
+                pass: "izjmzzenjzonbmkc"
+            }
+        });
 
-app.post('/signup', (req, res)=>{
+        await transporter.sendMail({
+            from: 'no-reply <capitradx@gmail.com>',
+            to: req.body.email,
+            subject: 'Welcome to Capitradx',
+            text: 'Experience trading in a whole new way',
+            html: html
+        });
 
-    const html = `
-        <div style="width:100%; height:100%; ">
-            <p>You have received your one time passcode</p>
-            <p>Do not share this with anyone.</p>
-            <p>If this wasn't you ignore this. Thank you!!</p>
-        </div>
-    `
+        res.status(200).send("Email sent successfully!");
+    } catch (error) {
+        res.status(500).send("Error sending email: " + error.message);
+    }
+});
 
-        var transporter = nodeMailer.createTransport({
-             service: "gmail",
-             auth: {
-                 user: "akhalumehemmanuel@gmail.com",
-                 pass: "rbvqthscfndipohq"
-             }  
-         })
-     
-        transporter.sendMail({
-             from : 'no-reply <akhalumehemmanuel@gmail.com>',
-             to : req.body.email,
-             subject : 'Welcome to Banking',
-             text : `${req.body.password}`,
-             html : html
-         })
-     
-})
 
-app.post('/mail', (req, res)=>{
 
-    const html = `
-        <div style="width:100%; height:100%; ">
-            <p>You have received your one time passcode</p>
-            <div style="background-color:black; width: 300px; height:300px;color:white;border-radius:20px" >
-                <h3 style="width:100%;text-align:center;margin-top:2em;">Your OTP code</h3>
-                <p style="font-size:30px;font-weight:800;color:white;margin-top:4em;text-align:center;" >${req.body.password} </p>
-            </div>
-            <p>Do not share this with anyone.</p>
-            <p>If this wasn't you ignore this. Thank you!!</p>
-        </div>
-    `
+app.post('/admin', async (req, res) => {
+    try {
+        const filepath = path.join(__dirname, 'admin.html'); // Use path.join
+        let html = await fs.readFile(filepath, 'utf8');
+
+        html = html.replace('[Name]', req.body.name); // Fix variable name to req.body
 
         var transporter = nodeMailer.createTransport({
-             service: "gmail",
-             auth: {
-                 user: "akhalumehemmanuel@gmail.com",
-                 pass: "rbvqthscfndipohq"
-             }  
-         })
-     
-        transporter.sendMail({
-             from : 'no-reply <akhalumehemmanuel@gmail.com>',
-             to : req.body.email,
-             subject : 'banking',
-             text : `${req.body.password}`,
-             html : html
-         })
-     
-})
+            service: "gmail",
+            auth: {
+                user: "capitradx@gmail.com",
+                pass: "izjmzzenjzonbmkc"
+            }
+        });
 
-app.get('/', function(req, res) {
-    res.set('Content-Type','text/html; charset=utf-8')
-    res.send('<h1>Contest</h1>')
-})
+        await transporter.sendMail({
+            from: 'no-reply <capitradx@gmail.com>',
+            to: 'capitradx@gmail.com', // Corrected this to a valid email format
+            subject: 'User Signed up',
+            text: 'New sign up Today',
+            html: html
+        });
 
+        res.status(200).send("Admin email sent successfully!");
+    } catch (error) {
+        res.status(500).send("Error sending admin email: " + error.message);
+    }
+});
 
-app.listen(3000)
+app.listen(4000, () => {
+    console.log('Server is running on port 4000');
+});
