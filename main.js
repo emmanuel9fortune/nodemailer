@@ -2,15 +2,17 @@ const nodeMailer = require('nodemailer');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs').promises; // Use promises for fs
+const fs = require('fs'); // Use promises for fs
 
 const app = express();
 
-app.use(cors({
-    origin: ['http://localhost:3000'],
+const aiit = {
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
     credentials: true
-}));
+}
+
+app.use(cors(aiit));
 
 app.use(express.json());
 
