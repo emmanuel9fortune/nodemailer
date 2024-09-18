@@ -2,36 +2,38 @@ const nodeMailer = require('nodemailer');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs'); // Use promises for fs
+const fs = require('fs').promises; // Use fs.promises for async operations
 
 const app = express();
 
 const aiit = {
     origin: 'http://localhost:3000',
     credentials: true
-}
+};
 
 app.use(cors(aiit));
-
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Welcome email endpoint
 app.post('/welcome', async (req, res) => {
     try {
-        const filepath = path.join(__dirname, 'welcome.html'); // Use path.join, not path.json
-        let html = await fs.readFile(filepath, 'utf8');
+        const filepath = path.join(__dirname, 'welcome.html'); // Path to the HTML file
+        let html = await fs.readFile(filepath, 'utf8'); // Read the HTML file asynchronously
 
-        html = html.replace('[Name]', req.body.name); // Use req.body instead of rea.body
+        // Replace placeholder [Name] with the actual name from the request body
+        html = html.replace('[Name]', req.body.name);
 
-        var transporter = nodeMailer.createTransport({
+        // Create the transporter for sending the email
+        let transporter = nodeMailer.createTransport({
             service: "gmail",
             auth: {
                 user: "capitradx@gmail.com",
-                pass: "izjmzzenjzonbmkc"
+                pass: "izjmzzenjzonbmkc" // Note: Store credentials securely in environment variables in production
             }
         });
 
+        // Send the email
         await transporter.sendMail({
             from: 'no-reply <capitradx@gmail.com>',
             to: req.body.email,
@@ -46,26 +48,28 @@ app.post('/welcome', async (req, res) => {
     }
 });
 
-
-
+// Admin notification email endpoint
 app.post('/admin', async (req, res) => {
     try {
-        const filepath = path.join(__dirname, 'admin.html'); // Use path.join
-        let html = await fs.readFile(filepath, 'utf8');
+        const filepath = path.join(__dirname, 'admin.html'); // Path to the admin HTML file
+        let html = await fs.readFile(filepath, 'utf8'); // Read the HTML file asynchronously
 
-        html = html.replace('[Name]', req.body.name); // Fix variable name to req.body
+        // Replace placeholder [Name] with the actual name from the request body
+        html = html.replace('[Name]', req.body.name);
 
-        var transporter = nodeMailer.createTransport({
+        // Create the transporter for sending the email
+        let transporter = nodeMailer.createTransport({
             service: "gmail",
             auth: {
                 user: "capitradx@gmail.com",
-                pass: "izjmzzenjzonbmkc"
+                pass: "izjmzzenjzonbmkc" // Again, use environment variables for credentials
             }
         });
 
+        // Send the admin notification email
         await transporter.sendMail({
             from: 'no-reply <capitradx@gmail.com>',
-            to: 'akhalumehemmanuel@gmail.com', // Corrected this to a valid email format
+            to: 'akhalumehemmanuel@gmail.com',
             subject: 'User Signed up',
             text: 'New sign up Today',
             html: html
@@ -77,6 +81,7 @@ app.post('/admin', async (req, res) => {
     }
 });
 
+// Start the server
 app.listen(4000, () => {
     console.log('Server is running on port 4000');
 });
