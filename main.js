@@ -1,30 +1,30 @@
 const nodeMailer = require('nodemailer');
 const express = require('express');
-const cors = require('cors'); // Add CORS import
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs').promises;
 
 const app = express();
 
-// CORS configuration to allow requests from specific origins
+// CORS configuration
 const corsOptions = {
-    origin: 'http://localhost:3000',  // Allow requests from this origin
-    credentials: true,                 // Enable credentials (cookies, authorization headers, etc.)
-    methods: ['GET', 'POST', 'OPTIONS'],       // Allowed methods
-    allowedHeaders: 'Content-Type, Authorization' // Allowed headers
+    origin: 'http://localhost:3000',  // Adjust this based on your frontend URL
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: 'Content-Type, Authorization'
 };
 
-// Apply CORS middleware globally
+// Apply CORS middleware
 app.use(cors(corsOptions));
 
 // Middleware to handle preflight (OPTIONS) requests
-app.options('*', cors(corsOptions));  // This will handle preflight requests for all routes
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Welcome email endpoint
-app.post('/welcome', async (req, res) => {
+app.post('/api/welcome', async (req, res) => {
     try {
         const filepath = path.join(__dirname, 'welcome.html');
         let html = await fs.readFile(filepath, 'utf8');
@@ -34,8 +34,8 @@ app.post('/welcome', async (req, res) => {
         let transporter = nodeMailer.createTransport({
             service: "gmail",
             auth: {
-                user: "capitradx@gmail.com",
-                pass: "izjmzzenjzonbmkc"
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
@@ -53,8 +53,8 @@ app.post('/welcome', async (req, res) => {
     }
 });
 
-// Admin notification email endpoint
-app.post('/admin', async (req, res) => {
+// Admin email endpoint
+app.post('/api/admin', async (req, res) => {
     try {
         const filepath = path.join(__dirname, 'admin.html');
         let html = await fs.readFile(filepath, 'utf8');
@@ -64,8 +64,8 @@ app.post('/admin', async (req, res) => {
         let transporter = nodeMailer.createTransport({
             service: "gmail",
             auth: {
-                user: "capitradx@gmail.com",
-                pass: "izjmzzenjzonbmkc"
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
@@ -83,14 +83,4 @@ app.post('/admin', async (req, res) => {
     }
 });
 
-
-app.get('/', function(req, res) {
-    res.set('Content-Type','text/html; charset=utf-8')
-    res.send('html')
-})
-
-
-// Start the server
-app.listen(4000, () => {
-    console.log('Server is running on port 4000');
-});
+module.exports = app;
